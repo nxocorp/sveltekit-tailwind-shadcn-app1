@@ -5,8 +5,11 @@
 
 	const todos = writable([]);
 	
+	let localStorageKeys = [];
+	
 	// Load data from localStorage
 	onMount(() => {
+		localStorageKeys = Object.keys(localStorage);
 		const storedTodos = localStorage.getItem('todos');
 		if (storedTodos) {
 			todos.set(JSON.parse(storedTodos));
@@ -74,71 +77,111 @@
 		});
 	};
 
+	const retrieveDataKey = (storageKey) => {
+		const rawData = localStorage.getItem(storageKey);
+		const data = JSON.parse(rawData);
+		if (Array.isArray(data) && data.length > 0) {
+			console.log("Storage key has data:", data);
+		} else {
+			console.log("Storage is empty");
+		}
+	};
+
+	const deleteDataKey = (storageKey) => {
+		localStorage.removeItem(storageKey);
+		localStorageKeys = localStorageKeys.filter(k => k !== storageKey);
+
+  }
+
 	
 </script>
 
+<main class="p-6 bg-gray-50 rounded-lg shadow-md">
 
-<main class="max-w-xl mx-auto mt-10">
-	<h1 class="text-2xl font-bold mb-5">Todo List</h1>
-
-	<form class="flex mb-4"
-		on:submit|preventDefault={() => {
-			const title = document.querySelector('#newTitle');
-			const check = document.querySelector('#newCheck');
-			const data = {title, check};
-			if (title) {
-				addTodo(data);
-				title.value = '';
-			}
-		}}
-	>
-		<input type="checkbox" 
-			id="newCheck"
-			class="mr-2" />
-		<input type="text" 
-			id="newTitle"
-			class="flex-1 p-2 border rounded-l mr-2"
-			placeholder="Add a new todo..." />
-		<button type="submit" 
-			class="p-2 bg-blue-500 text-white rounded-r">
-			Add
+	<h1 class="text-2xl font-bold mb-5">Available Keys</h1>
+	<ul class="mt-2 space-y-2">
+		{#each localStorageKeys as storageKey}
+		<li class="flex items-center justify-between">
+			<a href="##" class="text-blue-500 hover:underline"
+				on:click={(e)=>{
+					e.preventDefault();
+					retrieveDataKey(storageKey);
+				}} >
+				{storageKey}
+			</a>
+			<button class="btn btn-danger ml-4"
+				on:click={(e) => {
+					e.preventDefault();
+					deleteDataKey(storageKey);
+				}} >
+				Delete
 			</button>
-	</form>
-
-	<ul>
-		{#each $todos.sort((a, b) => a.index - b.index) as todo }
-			<li class="flex justify-between items-center mb-2 {todo.completed ? 'opacity-50' : ''}" >
-				
-				<input type="checkbox" 
-					class="mr-2" 
-					checked={todo.completed}
-					on:change={(e) => { updateTodo(todo.id, { completed: e.target.checked }); }} />
-
-				<button
-					class="p-1 mr-1 bg-gray-300 text-black rounded"
-					disabled={todo.index === 0} 
-					on:click={() => moveTodo(todo.id, 'up')} > ↑ </button>
-				<button
-					class="p-1 mr-2 bg-gray-300 text-black rounded"
-					disabled={todo.index === $todos.length - 1} 
-					on:click={() => moveTodo(todo.id, 'down')} > ↓ </button>
-				
-				<input type="text"
-					class="flex-1 p-2 border rounded mr-2"
-					placeholder="Enter todo item"
-					value={todo.title}
-					on:input={(e) => { updateTodo(todo.id, { title: e.target.value }); }}
-					/>
-				
-				<button
-					class="p-2 bg-red-500 text-white rounded"
-					on:click={() => deleteTodo(todo.id)}
-					> Delete </button>
-				
-			</li>
+		</li>
 		{/each}
-		
 	</ul>
+
+	<div class="max-w-xl mx-auto mt-10">
+		<h1 class="text-2xl font-bold mb-5">Todo List</h1>
+	
+		<form class="flex mb-4"
+			on:submit|preventDefault={() => {
+				const title = document.querySelector('#newTitle');
+				const check = document.querySelector('#newCheck');
+				const data = {title, check};
+				if (title) {
+					addTodo(data);
+					title.value = '';
+				}
+			}}
+		>
+			<input type="checkbox" 
+				id="newCheck"
+				class="mr-2" />
+			<input type="text" 
+				id="newTitle"
+				class="flex-1 p-2 border rounded-l mr-2"
+				placeholder="Add a new todo..." />
+			<button type="submit" 
+				class="p-2 bg-blue-500 text-white rounded-r">
+				Add
+				</button>
+		</form>
+	
+		<ul>
+			{#each $todos.sort((a, b) => a.index - b.index) as todo }
+				<li class="flex justify-between items-center mb-2 {todo.completed ? 'opacity-50' : ''}" >
+					
+					<input type="checkbox" 
+						class="mr-2" 
+						checked={todo.completed}
+						on:change={(e) => { updateTodo(todo.id, { completed: e.target.checked }); }} />
+	
+					<button
+						class="p-1 mr-1 bg-gray-300 text-black rounded"
+						disabled={todo.index === 0} 
+						on:click={() => moveTodo(todo.id, 'up')} > ↑ </button>
+					<button
+						class="p-1 mr-2 bg-gray-300 text-black rounded"
+						disabled={todo.index === $todos.length - 1} 
+						on:click={() => moveTodo(todo.id, 'down')} > ↓ </button>
+					
+					<input type="text"
+						class="flex-1 p-2 border rounded mr-2"
+						placeholder="Enter todo item"
+						value={todo.title}
+						on:input={(e) => { updateTodo(todo.id, { title: e.target.value }); }}
+						/>
+					
+					<button
+						class="p-2 bg-red-500 text-white rounded"
+						on:click={() => deleteTodo(todo.id)}
+						> Delete </button>
+					
+				</li>
+			{/each}
+			
+		</ul>
+	</div>	
 </main>
 
 <style>
