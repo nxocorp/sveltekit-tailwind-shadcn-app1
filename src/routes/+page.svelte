@@ -1,9 +1,7 @@
-<script lang="ts">
+<script>
 
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
-
-	import { Button } from '$lib/components/ui/button';	
 
 	const todos = writable([]);
 	
@@ -24,10 +22,10 @@
 	const addTodo = (data) => {
 		todos.update((currentTodos) => {
 			const newTodos = [ ...currentTodos, { 
-				id: 				Date.now(), 
-				title: 			data.title.value || '', 
+				id: 		Date.now(), 
+				title: 		data.title.value || '', 
 				completed: 	data.check.checked, 
-				index: 			currentTodos.length
+				index: 		currentTodos.length
 			}];
 			saveToLocalStorage(newTodos);
 			return newTodos;
@@ -101,10 +99,10 @@
 			id="newTitle"
 			class="flex-1 p-2 border rounded-l mr-2"
 			placeholder="Add a new todo..." />
-		<Button type="submit" 
+		<button type="submit" 
 			class="p-2 bg-blue-500 text-white rounded-r">
 			Add
-			</Button>
+			</button>
 	</form>
 
 	<ul>
@@ -116,14 +114,14 @@
 					checked={todo.completed}
 					on:change={(e) => { updateTodo(todo.id, { completed: e.target.checked }); }} />
 
-				<Button
+				<button
 					class="p-1 mr-1 bg-gray-300 text-black rounded"
 					disabled={todo.index === 0} 
-					on:click={() => moveTodo(todo.id, 'up')} > ↑ </Button>
-				<Button
+					on:click={() => moveTodo(todo.id, 'up')} > ↑ </button>
+				<button
 					class="p-1 mr-2 bg-gray-300 text-black rounded"
 					disabled={todo.index === $todos.length - 1} 
-					on:click={() => moveTodo(todo.id, 'down')} > ↓ </Button>
+					on:click={() => moveTodo(todo.id, 'down')} > ↓ </button>
 				
 				<input type="text"
 					class="flex-1 p-2 border rounded mr-2"
@@ -132,10 +130,10 @@
 					on:input={(e) => { updateTodo(todo.id, { title: e.target.value }); }}
 					/>
 				
-				<Button
+				<button
 					class="p-2 bg-red-500 text-white rounded"
 					on:click={() => deleteTodo(todo.id)}
-					> Delete </Button>
+					> Delete </button>
 				
 			</li>
 		{/each}
